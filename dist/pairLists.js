@@ -1,6 +1,6 @@
 "use strict";
-exports.__esModule = true;
-var mainnet = [
+Object.defineProperty(exports, "__esModule", { value: true });
+const mainnet = [
     {
         chainId: 1,
         address: '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc',
@@ -12,7 +12,7 @@ var mainnet = [
         symbol: 'WETH-USDT'
     }
 ];
-var xDaiPairs = [
+const xDaiPairs = [
     {
         chainId: 100,
         address: '0x50a4867aee9cafd6ddc84de3ce59df027cb29084',

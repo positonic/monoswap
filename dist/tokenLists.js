@@ -1,10 +1,10 @@
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * Source:
    const coinListUrl = 'https://wispy-bird-88a7.uniswap.workers.dev/?url=http://erc20.cmc.eth.link'
  */
-var cmc200 = {
+const cmc200 = {
     name: 'CMC200 ERC20',
     timestamp: '2020-08-25T12:00:15+00:00',
     keywords: ['coinmarketcap', 'erc20', 'cmc200'],

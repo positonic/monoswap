@@ -7,86 +7,61 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-var axios = require('axios');
+const axios = require('axios');
 function fetchSwapForPair(pairId, timestamp, chainId) {
-    return __awaiter(this, void 0, void 0, function () {
-        var query, graphUrl, response;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    query = "\n  query GetSwap {\n    swaps(first: 1, orderBy: timestamp, orderDirection: desc, where:\n      { pair: \"" + pairId + "\", timestamp_lt: \"" + timestamp + "\" }\n     ) {\n          pair {\n            token0 {\n              symbol\n            }\n            token1 {\n              symbol\n            }\n          }\n          amount0In\n          amount0Out\n          amount1In\n          amount1Out\n          amountUSD\n          to\n      }\n  }\n  ";
-                    console.log("query ---> : " + query);
-                    graphUrl = '';
-                    if (chainId === 1) {
-                        graphUrl = 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2';
-                    }
-                    else if (chainId === 100) {
-                        graphUrl = 'https://api.thegraph.com/subgraphs/name/1hive/uniswap-v2';
-                    }
-                    else {
-                        throw new Error("unsupported chainId");
-                    }
-                    return [4 /*yield*/, axios({
-                            url: graphUrl,
-                            method: 'post',
-                            data: {
-                                query: query
-                            }
-                        })
-                        //console.log(`response : ${JSON.stringify(response, null, 2)}`)
-                    ];
-                case 1:
-                    response = _a.sent();
-                    //console.log(`response : ${JSON.stringify(response, null, 2)}`)
-                    return [2 /*return*/, response.data.data.swaps[0]];
+    return __awaiter(this, void 0, void 0, function* () {
+        const query = `
+  query GetSwap {
+    swaps(first: 1, orderBy: timestamp, orderDirection: desc, where:
+      { pair: "${pairId}", timestamp_lt: "${timestamp}" }
+     ) {
+          pair {
+            token0 {
+              symbol
+            }
+            token1 {
+              symbol
+            }
+          }
+          amount0In
+          amount0Out
+          amount1In
+          amount1Out
+          amountUSD
+          to
+      }
+  }
+  `;
+        console.log(`query ---> : ${query}`);
+        let graphUrl = '';
+        if (chainId === 1) {
+            graphUrl = 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2';
+        }
+        else if (chainId === 100) {
+            graphUrl = 'https://api.thegraph.com/subgraphs/name/1hive/uniswap-v2';
+        }
+        else {
+            throw new Error("unsupported chainId");
+        }
+        const response = yield axios({
+            url: graphUrl,
+            method: 'post',
+            data: {
+                query
             }
         });
+        //console.log(`response : ${JSON.stringify(response, null, 2)}`)
+        return response.data.data.swaps[0];
     });
 }
 function run() {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, fetchSwapForPair("0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc", "1615588247")];
-                case 1:
-                    _a.sent();
-                    return [4 /*yield*/, fetchSwapForPair("0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc", "1615591976")];
-                case 2:
-                    _a.sent();
-                    return [2 /*return*/];
-            }
-        });
+    return __awaiter(this, void 0, void 0, function* () {
+        yield fetchSwapForPair("0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc", "1615588247");
+        yield fetchSwapForPair("0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc", "1615591976");
     });
 }
 // run()
 module.exports = {
-    fetchSwapForPair: fetchSwapForPair
+    fetchSwapForPair
 };
 //# sourceMappingURL=theGraph.js.map

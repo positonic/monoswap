@@ -6,42 +6,40 @@ var __importStar = (this && this.__importStar) || function (mod) {
     result["default"] = mod;
     return result;
 };
-exports.__esModule = true;
-var dotenv = __importStar(require("dotenv"));
+Object.defineProperty(exports, "__esModule", { value: true });
+const dotenv = __importStar(require("dotenv"));
 dotenv.config();
-var envVars = [
+const envVars = [
     'ETHEREUM_NODE_ID',
     'XDAI_NODE_HTTP_URL',
     'MAINNET_NODE_HTTP_URL',
     'XDAI_NODE_WS_URL',
     'MAINNET_NODE_WS_URL'
 ];
-var Config = /** @class */ (function () {
-    function Config(envFile) {
+class Config {
+    constructor(envFile) {
         this.env = envFile;
         this.validateEnv(envFile);
     }
     //Have this - replace it!
-    Config.prototype.validateEnv = function (envFile) {
-        var _this = this;
-        envVars.forEach(function (envVar) {
+    validateEnv(envFile) {
+        envVars.forEach((envVar) => {
             if (envFile[envVar]) {
-                _this.env[envVar] = envFile[envVar];
+                this.env[envVar] = envFile[envVar];
                 // console.log(`envVar ---> : ${this[envVar]}`)
             }
             else {
-                throw new Error("Need to provide a " + envVar + " in the .env");
+                throw new Error(`Need to provide a ${envVar} in the .env`);
             }
         });
-    };
-    Config.prototype.get = function (envVar) {
+    }
+    get(envVar) {
         if (!this.env[envVar]) {
-            throw new Error(envVar + " is an invalid env variable");
+            throw new Error(`${envVar} is an invalid env variable`);
         }
         return this.env[envVar];
-    };
-    return Config;
-}());
-var config = new Config(process.env);
-exports["default"] = config;
+    }
+}
+const config = new Config(process.env);
+exports.default = config;
 //# sourceMappingURL=config.js.map

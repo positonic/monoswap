@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "target": "es6",
     "preserveConstEnums": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -9,7 +10,8 @@
     "sourceMap": true,
     "forceConsistentCasingInFileNames": false,
     "allowJs":true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "declaration": true
   },
   "exclude": ["dist", "node_modules", "**/*.spec.ts", "**/*.js"]
 }
