@@ -87,6 +87,69 @@ function getTokenPrices(symbol, baseSymbols, chainId) {
     });
 }
 exports.getTokenPrices = getTokenPrices;
+function getTokenPricesFromAddress(address, baseSymbols, chainId) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            return [2 /*return*/, new Promise(function (resolve, reject) {
+                    var pricePromises = baseSymbols.map(function (base) {
+                        return getTokenPriceFromAddress(address, base, chainId);
+                    });
+                    Promise.all(pricePromises)
+                        .then(function (prices) {
+                        resolve(prices);
+                    })["catch"](reject);
+                })];
+        });
+    });
+}
+exports.getTokenPricesFromAddress = getTokenPricesFromAddress;
+/**
+ *
+ * @param symbol 'MKR'
+ * @param baseSymbol 'USDT'
+ * @param chainId 1
+ * @returns
+ */
+function getTokenPriceFromAddress(address, baseSymbol, chainId, symbol) {
+    if (symbol === void 0) { symbol = 'Dunno'; }
+    return __awaiter(this, void 0, void 0, function () {
+        var sdk, token, baseTokenFromList, baseToken, provider, pair, error_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 6, , 7]);
+                    sdk = new sdk_1["default"](chainId);
+                    return [4 /*yield*/, getTokenFromAddress(address, chainId)];
+                case 1:
+                    token = _a.sent();
+                    return [4 /*yield*/, getTokenFromList(baseSymbol, chainId)
+                        //const baseToken = await getTokenFromAddress(address, chainId)
+                    ];
+                case 2:
+                    baseTokenFromList = _a.sent();
+                    return [4 /*yield*/, sdk.getSwapToken(baseTokenFromList)];
+                case 3:
+                    baseToken = _a.sent();
+                    if (!baseToken)
+                        throw Error("BaseSymbol " + baseSymbol + " not found in our token list");
+                    if (address === baseToken.address)
+                        return [2 /*return*/, 1];
+                    provider = getProvider(getNetworkFromChainId(chainId));
+                    return [4 /*yield*/, sdk.getPair(token, baseToken, provider, chainId)];
+                case 4:
+                    pair = _a.sent();
+                    return [4 /*yield*/, sdk.getPrice(pair, token, chainId)];
+                case 5: return [2 /*return*/, _a.sent()];
+                case 6:
+                    error_1 = _a.sent();
+                    console.log("Warning, no price for:  ---> : " + address + ", " + baseSymbol + " - " + chainId);
+                    return [3 /*break*/, 7];
+                case 7: return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.getTokenPriceFromAddress = getTokenPriceFromAddress;
 /**
  * Get Token details
  */
@@ -118,6 +181,32 @@ function getTestPrice(symbol, baseSymbol, chainId) {
 function getETHisETHPrice() {
     return 1;
 }
+function getPairFromAddresses(addresses, chainId) {
+    return __awaiter(this, void 0, void 0, function () {
+        var sdk, tokensPromises, tokens, pair;
+        var _this = this;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    sdk = new sdk_1["default"](chainId);
+                    tokensPromises = addresses.map(function (address) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0: return [4 /*yield*/, getTokenFromAddress(address, chainId)];
+                            case 1: return [2 /*return*/, _a.sent()];
+                        }
+                    }); }); });
+                    return [4 /*yield*/, Promise.all(tokensPromises)];
+                case 1:
+                    tokens = _a.sent();
+                    return [4 /*yield*/, sdk.getPair(tokens[0], tokens[1], getProvider(getNetworkFromChainId(chainId)), chainId)];
+                case 2:
+                    pair = _a.sent();
+                    return [2 /*return*/, pair];
+            }
+        });
+    });
+}
+exports.getPairFromAddresses = getPairFromAddresses;
 function getPairFromSymbols(symbol, baseSymbol, chainId) {
     return __awaiter(this, void 0, void 0, function () {
         var sdk, token, baseToken;
@@ -155,7 +244,7 @@ function getPairFromSymbols(symbol, baseSymbol, chainId) {
 exports.getPairFromSymbols = getPairFromSymbols;
 function getTokenPrice(symbol, baseSymbol, chainId) {
     return __awaiter(this, void 0, void 0, function () {
-        var sdk, pair, token, error_1;
+        var sdk, pair, token, error_2;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -169,9 +258,9 @@ function getTokenPrice(symbol, baseSymbol, chainId) {
                         throw Error("Symbol " + symbol + " not found in our token list");
                     return [2 /*return*/, sdk.getPrice(pair, token, chainId)];
                 case 2:
-                    error_1 = _a.sent();
-                    console.error(error_1);
-                    throw new Error(error_1);
+                    error_2 = _a.sent();
+                    console.error(error_2);
+                    throw new Error(error_2);
                 case 3: return [2 /*return*/];
             }
         });
@@ -208,6 +297,52 @@ function convertPriceEthToUsd(priceInEth, timeStamp) {
     });
 }
 exports.convertPriceEthToUsd = convertPriceEthToUsd;
+/**
+ *
+ * @param symbol 'MKR'
+ * @param baseSymbol 'USDT'
+ * @param chainId 1
+ * @returns
+ */
+function getTokenExecutionPriceFromAddress(address, baseSymbol, chainId, amount) {
+    return __awaiter(this, void 0, void 0, function () {
+        var sdk, token, baseToken, provider, pair, price, error_3;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 4, , 5]);
+                    sdk = new sdk_1["default"](chainId);
+                    return [4 /*yield*/, getTokenFromAddress(address, chainId)];
+                case 1:
+                    token = _a.sent();
+                    if (!token)
+                        throw Error("Can't find a token for address " + address + " not found in our token list");
+                    return [4 /*yield*/, getTokenFromAddress(address, chainId)];
+                case 2:
+                    baseToken = _a.sent();
+                    if (!baseToken)
+                        throw Error("BaseSymbol " + baseSymbol + " not found in our token list");
+                    if (token.address === baseToken.address)
+                        return [2 /*return*/, 1];
+                    provider = getProvider(getNetworkFromChainId(chainId));
+                    return [4 /*yield*/, sdk.getPair(token, baseToken, provider, chainId)];
+                case 3:
+                    pair = _a.sent();
+                    price = sdk.getExecutionPrice(pair, baseToken, amount) // NO await?
+                    ;
+                    return [2 /*return*/, price
+                        // return sdk.getPrice(pair, token, chainId)
+                    ];
+                case 4:
+                    error_3 = _a.sent();
+                    console.error(error_3);
+                    throw new Error(error_3);
+                case 5: return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.getTokenExecutionPriceFromAddress = getTokenExecutionPriceFromAddress;
 function getPriceAtTime(from, to, timestamp, chainId) {
     return __awaiter(this, void 0, void 0, function () {
         var sdk, pair, swap, price;
@@ -247,4 +382,30 @@ function getPriceAtTime(from, to, timestamp, chainId) {
     });
 }
 exports.getPriceAtTime = getPriceAtTime;
+function getTokenFromAddress(address, chainId) {
+    return __awaiter(this, void 0, void 0, function () {
+        var sdk, tokenFromList, token;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    sdk = new sdk_1["default"](chainId);
+                    tokenFromList = tokenLists_1.allTokens.find(function (o) {
+                        return o.address.toLowerCase() === address.toLowerCase() && o.chainId === chainId;
+                    });
+                    if (!tokenFromList) return [3 /*break*/, 2];
+                    return [4 /*yield*/, sdk.getSwapToken(tokenFromList)];
+                case 1:
+                    token = _a.sent();
+                    return [3 /*break*/, 4];
+                case 2:
+                    console.error("WARNING unknown address " + address);
+                    return [4 /*yield*/, sdk.createToken(1, address, 'DUNNO', 'dont know', 18)];
+                case 3:
+                    token = _a.sent();
+                    _a.label = 4;
+                case 4: return [2 /*return*/, token];
+            }
+        });
+    });
+}
 //# sourceMappingURL=index.js.map

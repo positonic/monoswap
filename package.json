@@ -1,6 +1,6 @@
 {
   "name": "monoswap",
-  "version": "0.0.5",
+  "version": "0.1.6",
   "description": "",
   "main": "dist/index.js",
   "dependencies": {
