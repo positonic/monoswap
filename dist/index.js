@@ -152,6 +152,7 @@ function getPairFromSymbols(symbol, baseSymbol, chainId) {
         });
     });
 }
+exports.getPairFromSymbols = getPairFromSymbols;
 function getTokenPrice(symbol, baseSymbol, chainId) {
     return __awaiter(this, void 0, void 0, function () {
         var sdk, pair, token, error_1;

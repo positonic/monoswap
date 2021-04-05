@@ -55,6 +55,62 @@ export async function getTokenPrices (
   })
 }
 
+export async function getTokenPricesFromAddress (
+  address: string,
+  baseSymbols: string[],
+  chainId: number
+) {
+  return new Promise((resolve: (prices: number[]) => void, reject) => {
+    const pricePromises = baseSymbols.map(base =>
+      getTokenPriceFromAddress(address, base, chainId)
+    )
+    Promise.all(pricePromises)
+      .then((prices: number[]) => {
+        resolve(prices)
+      })
+      .catch(reject)
+  })
+}
+/**
+ *
+ * @param symbol 'MKR'
+ * @param baseSymbol 'USDT'
+ * @param chainId 1
+ * @returns
+ */
+export async function getTokenPriceFromAddress (
+  address: string,
+  baseSymbol: string,
+  chainId: number,
+  symbol: string = 'Dunno'
+) {
+  try {
+    const sdk = new Sdk(chainId)
+    const token = await getTokenFromAddress(address, chainId)
+
+    const baseTokenFromList = await getTokenFromList(baseSymbol, chainId)
+    //const baseToken = await getTokenFromAddress(address, chainId)
+    const baseToken = await sdk.getSwapToken(baseTokenFromList)
+    if (!baseToken)
+      throw Error(`BaseSymbol ${baseSymbol} not found in our token list`)
+
+    if (address === baseToken.address) return 1
+    const provider = getProvider(getNetworkFromChainId(chainId))
+
+    const pair = await sdk.getPair(token, baseToken, provider, chainId)
+
+    return await sdk.getPrice(pair, token, chainId)
+  } catch (error) {
+    console.log(
+      `Warning, no price for:  ---> : ${address}, ${baseSymbol} - ${chainId}`
+    )
+
+    // There may be no pair so return 0
+    // console.error(error)
+    // throw new Error(error)
+  }
+}
+
 /**
  * Get Token details
  */
@@ -89,6 +145,27 @@ function getTestPrice (symbol, baseSymbol, chainId) {
 }
 function getETHisETHPrice () {
   return 1
+}
+
+export async function getPairFromAddresses (
+  addresses: string[],
+  chainId: number
+) {
+  const sdk = new Sdk(chainId)
+  const tokensPromises = addresses.map(
+    async address => await getTokenFromAddress(address, chainId)
+  )
+
+  const tokens = await Promise.all(tokensPromises)
+
+  const pair = await sdk.getPair(
+    tokens[0],
+    tokens[1],
+    getProvider(getNetworkFromChainId(chainId)),
+    chainId
+  )
+
+  return pair
 }
 
 export async function getPairFromSymbols (
@@ -174,6 +251,44 @@ export async function convertPriceEthToUsd (priceInEth, timeStamp) {
   return priceUsd
 }
 
+/**
+ *
+ * @param symbol 'MKR'
+ * @param baseSymbol 'USDT'
+ * @param chainId 1
+ * @returns
+ */
+export async function getTokenExecutionPriceFromAddress (
+  address: string,
+  baseSymbol: string,
+  chainId: number,
+  amount: number
+) {
+  try {
+    const sdk = new Sdk(chainId)
+    const token = await getTokenFromAddress(address, chainId)
+    if (!token)
+      throw Error(
+        `Can't find a token for address ${address} not found in our token list`
+      )
+
+    const baseToken = await getTokenFromAddress(address, chainId)
+    if (!baseToken)
+      throw Error(`BaseSymbol ${baseSymbol} not found in our token list`)
+
+    if (token.address === baseToken.address) return 1
+    const provider = getProvider(getNetworkFromChainId(chainId))
+    const pair = await sdk.getPair(token, baseToken, provider, chainId)
+    const price = sdk.getExecutionPrice(pair, baseToken, amount) // NO await?
+
+    return price
+    // return sdk.getPrice(pair, token, chainId)
+  } catch (error) {
+    console.error(error)
+    throw new Error(error)
+  }
+}
+
 export async function getPriceAtTime (
   from: string,
   to: string,
@@ -219,4 +334,24 @@ export async function getPriceAtTime (
   // }
 
   return price
+}
+
+async function getTokenFromAddress (address: string, chainId: number) {
+  const sdk = new Sdk(chainId)
+  //const tokenFromList = getTokenFromList(symbol, chainId)
+  const tokenFromList = allTokens.find(
+    o =>
+      o.address.toLowerCase() === address.toLowerCase() && o.chainId === chainId
+  )
+  //console.log(`tokenFromList : ${JSON.stringify(tokenFromList, null, 2)}`)
+
+  let token
+  if (tokenFromList) {
+    token = await sdk.getSwapToken(tokenFromList)
+  } else {
+    console.error(`WARNING unknown address ${address}`)
+    token = await sdk.createToken(1, address, 'DUNNO', 'dont know', 18)
+  }
+
+  return token
 }
