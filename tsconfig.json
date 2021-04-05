@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "preserveConstEnums": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "outDir": "./dist",
+    "rootDir": "./",
+    "module": "commonjs",
+    "sourceMap": true,
+    "forceConsistentCasingInFileNames": false,
+    "allowJs":true,
+    "experimentalDecorators": true
+  },
+  "exclude": ["dist", "node_modules", "**/*.spec.ts", "**/*.js"]
+}

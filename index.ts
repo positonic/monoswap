@@ -16,7 +16,7 @@ function getProvider (network) {
       )}`
     )
     return new ethers.providers.JsonRpcProvider(
-      config.get('XDAI_NODE_HTTP_URL')
+      config.get('XDAI_NODE_HTTP_URL').toString()
     )
   }
   return new ethers.providers.InfuraProvider(network, INFURA_ID)
