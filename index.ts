@@ -91,7 +91,7 @@ function getETHisETHPrice () {
   return 1
 }
 
-async function getPairFromSymbols (
+export async function getPairFromSymbols (
   symbol: string,
   baseSymbol: string,
   chainId: number
