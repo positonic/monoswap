@@ -1,0 +1,23 @@
+{
+  "name": "monoswap",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "dependencies": {
+    "@uniswap/sdk": "^3.0.3",
+    "axios": "^0.21.1",
+    "dotenv": "^8.2.0",
+    "esbuild": "^0.11.5",
+    "esbuild-runner": "^1.3.2",
+    "ethers": "^5.1.0",
+    "honeyswap-sdk": "^1.0.0",
+    "mocha": "^8.3.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "nodemon -r esbuild-runner/register --watch . --exec 'mocha -r esbuild-runner/register price.spec.ts'"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
