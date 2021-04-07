@@ -86,18 +86,18 @@ export default class Sdk {
     const route = new Route([pair], token)
     // const price = route.midPrice.toSignificant(6)
 
-    console.log(`route : ${JSON.stringify(route, null, 2)}`)
+    // console.log(`route : ${JSON.stringify(route, null, 2)}`)
 
-    console.log(`this.chainId ---> : ${this.chainId}`)
-    console.log(`amount ---> : ${amount}`)
-    console.log(`typeof amount ---> : ${typeof amount}`)
-    console.log(
-      `AMOUNT : ${JSON.stringify(
-        new TokenAmount(token, amount.toString()),
-        null,
-        2
-      )}`
-    )
+    // console.log(`this.chainId ---> : ${this.chainId}`)
+    // console.log(`amount ---> : ${amount}`)
+    // console.log(`typeof amount ---> : ${typeof amount}`)
+    // console.log(
+    //   `AMOUNT : ${JSON.stringify(
+    //     new TokenAmount(token, amount.toString()),
+    //     null,
+    //     2
+    //   )}`
+    // )
 
     const trade = new Trade(
       route,

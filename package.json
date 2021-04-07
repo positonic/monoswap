@@ -1,6 +1,6 @@
 {
   "name": "monoswap",
-  "version": "0.2.1",
+  "version": "0.2.8",
   "description": "",
   "main": "dist/index.js",
   "dependencies": {
@@ -19,7 +19,7 @@
   },
   "scripts": {
     "test": "nodemon -r esbuild-runner/register --watch . --exec 'mocha -r esbuild-runner/register price.spec.ts'",
-    "publish": "tsc && npm publish"
+    "bp": "tsc && npm publish"
   },
   "keywords": [],
   "author": "",

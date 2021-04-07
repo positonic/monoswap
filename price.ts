@@ -22,8 +22,6 @@ type swap = {
  * @returns
  */
 export function getPriceFromSwap (swap: swap, baseSymbol: string) {
-  console.log(`swap : ${JSON.stringify(swap, null, 2)}`)
-
   const baseToken = swap.pair.token0.symbol === baseSymbol ? 0 : 1
 
   let price = 0

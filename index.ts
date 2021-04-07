@@ -1,5 +1,5 @@
 import Sdk from './sdk'
-import ethers from 'ethers'
+import * as ethers from 'ethers'
 import config from './config'
 import { allTokens } from './tokenLists'
 import { pairs } from './pairLists'
@@ -122,7 +122,8 @@ export function getTokenFromList (symbol: string, chainId: number) {
     o => o.symbol === inSymbol && o.chainId === chainId
   )
 
-  if (!token) throw new Error(`Token ${inSymbol} not found`)
+  if (!token)
+    throw new Error(`Token ${inSymbol} not found for chainId ${chainId}`)
   return token
 }
 
@@ -136,9 +137,6 @@ function isETHisETH (symbol, baseSymbol) {
   return symbol === 'ETH' && baseSymbol === 'ETH'
 }
 function getTestPrice (symbol, baseSymbol, chainId) {
-  console.log(`symbol ---> : ${symbol}`)
-  console.log(`baseSymbol ---> : ${baseSymbol}`)
-  console.log(`chainId ---> : ${chainId}`)
   if (symbol === 'ETH' && baseSymbol === 'USDT') return 2000
   if (symbol === 'ETH' && baseSymbol === 'ETH') return 1
   throw Error('No test price, this should not happen')
@@ -175,9 +173,6 @@ export async function getPairFromSymbols (
 ) {
   const sdk = new Sdk(chainId)
 
-  console.log(`symbol ---> : ${symbol}`)
-  console.log(`baseSymbol ---> : ${baseSymbol}`)
-  console.log(`chainId ---> : ${chainId}`)
   if (isETHisETH(symbol, baseSymbol)) return getETHisETHPrice()
   // if (isTestPrice(symbol, baseSymbol))
   //   return getTestPrice(symbol, baseSymbol, chainId)
@@ -194,9 +189,6 @@ export async function getPairFromSymbols (
 
   if (token.address === baseToken.address) return 1
 
-  console.log(
-    `getNetworkFromChainId(chainId) ---> : ${getNetworkFromChainId(chainId)}`
-  )
   return await sdk.getPair(
     token,
     baseToken,
@@ -232,8 +224,9 @@ export async function convertPriceUsdToEth (priceInUsd, timeStamp) {
     timeStamp,
     1
   )
+  const usdPerEth = 1 / priceEthUsdAtTime
 
-  const priceEth = priceInUsd / priceEthUsdAtTime
+  const priceEth = priceInUsd / usdPerEth
 
   return priceEth
 }
@@ -246,9 +239,10 @@ export async function convertPriceEthToUsd (priceInEth, timeStamp) {
     1
   )
 
-  const priceUsd = priceInEth * priceEthUsdAtTime
+  const usdPerEth = 1 / priceEthUsdAtTime
+  const priceEth = priceInEth * usdPerEth
 
-  return priceUsd
+  return priceEth
 }
 
 /**
@@ -304,18 +298,19 @@ export async function getPriceAtTime (
       `No pair found from ${from} to ${to} and chainID ${chainId}`
     )
 
-  console.log(`pair : ${JSON.stringify(pair, null, 2)}`)
+  const quoteToken = pair.tokenAmounts[0].token.symbol === from ? 'from' : 'to'
 
-  console.log(`pair.address ---> : ${pair.liquidityToken.address}`)
-  console.log(`timestamp ---> : ${timestamp}`)
-  console.log(`chainId ---> : ${chainId}`)
+  ///console.log(`quoteToken ---> : ${quoteToken}`)
+  // console.log(`pair : ${JSON.stringify(pair, null, 2)}`)
+
+  // console.log(`pair.address ---> : ${pair.liquidityToken.address}`)
+  // console.log(`timestamp ---> : ${timestamp}`)
+  // console.log(`chainId ---> : ${chainId}`)
   const swap = await fetchSwapForPair(
     pair.liquidityToken.address.toLowerCase(),
     Math.round(timestamp),
     chainId
   )
-
-  console.log(`swap§ ---> : ${swap}`)
 
   const price = getPriceFromSwap(swap, to)
   // const action = getActionFromSwap(swap, to)
@@ -333,7 +328,7 @@ export async function getPriceAtTime (
   //   throw new Error('Should not happen')
   // }
 
-  return price
+  return quoteToken === 'from' ? price : 1 / price
 }
 
 async function getTokenFromAddress (address: string, chainId: number) {

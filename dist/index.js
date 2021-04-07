@@ -11,9 +11,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const sdk_1 = __importDefault(require("./sdk"));
-const ethers_1 = __importDefault(require("ethers"));
+const ethers = __importStar(require("ethers"));
 const config_1 = __importDefault(require("./config"));
 const tokenLists_1 = require("./tokenLists");
 const theGraph_1 = require("./theGraph");
@@ -22,9 +29,9 @@ const INFURA_ID = config_1.default.get('ETHEREUM_NODE_ID');
 function getProvider(network) {
     if (network === 'xdaiChain') {
         console.log(`config.get('XDAI_NODE_HTTP_URL') ---> : ${config_1.default.get('XDAI_NODE_HTTP_URL')}`);
-        return new ethers_1.default.providers.JsonRpcProvider(config_1.default.get('XDAI_NODE_HTTP_URL').toString());
+        return new ethers.providers.JsonRpcProvider(config_1.default.get('XDAI_NODE_HTTP_URL').toString());
     }
-    return new ethers_1.default.providers.InfuraProvider(network, INFURA_ID);
+    return new ethers.providers.InfuraProvider(network, INFURA_ID);
 }
 function getNetworkFromChainId(chainId) {
     if (chainId === 1) {
@@ -109,7 +116,7 @@ function getTokenFromList(symbol, chainId) {
     const inSymbol = symbol.toUpperCase() === 'ETH' ? 'WETH' : symbol.toUpperCase();
     const token = tokenLists_1.allTokens.find(o => o.symbol === inSymbol && o.chainId === chainId);
     if (!token)
-        throw new Error(`Token ${inSymbol} not found`);
+        throw new Error(`Token ${inSymbol} not found for chainId ${chainId}`);
     return token;
 }
 exports.getTokenFromList = getTokenFromList;
@@ -121,9 +128,6 @@ function isETHisETH(symbol, baseSymbol) {
     return symbol === 'ETH' && baseSymbol === 'ETH';
 }
 function getTestPrice(symbol, baseSymbol, chainId) {
-    console.log(`symbol ---> : ${symbol}`);
-    console.log(`baseSymbol ---> : ${baseSymbol}`);
-    console.log(`chainId ---> : ${chainId}`);
     if (symbol === 'ETH' && baseSymbol === 'USDT')
         return 2000;
     if (symbol === 'ETH' && baseSymbol === 'ETH')
@@ -146,9 +150,6 @@ exports.getPairFromAddresses = getPairFromAddresses;
 function getPairFromSymbols(symbol, baseSymbol, chainId) {
     return __awaiter(this, void 0, void 0, function* () {
         const sdk = new sdk_1.default(chainId);
-        console.log(`symbol ---> : ${symbol}`);
-        console.log(`baseSymbol ---> : ${baseSymbol}`);
-        console.log(`chainId ---> : ${chainId}`);
         if (isETHisETH(symbol, baseSymbol))
             return getETHisETHPrice();
         // if (isTestPrice(symbol, baseSymbol))
@@ -161,7 +162,6 @@ function getPairFromSymbols(symbol, baseSymbol, chainId) {
             throw Error(`BaseSymbol ${baseSymbol} not found in our token list`);
         if (token.address === baseToken.address)
             return 1;
-        console.log(`getNetworkFromChainId(chainId) ---> : ${getNetworkFromChainId(chainId)}`);
         return yield sdk.getPair(token, baseToken, getProvider(getNetworkFromChainId(chainId)), chainId);
     });
 }
@@ -186,7 +186,8 @@ exports.getTokenPrice = getTokenPrice;
 function convertPriceUsdToEth(priceInUsd, timeStamp) {
     return __awaiter(this, void 0, void 0, function* () {
         const priceEthUsdAtTime = yield getPriceAtTime('ETH', 'USDT', timeStamp, 1);
-        const priceEth = priceInUsd / priceEthUsdAtTime;
+        const usdPerEth = 1 / priceEthUsdAtTime;
+        const priceEth = priceInUsd / usdPerEth;
         return priceEth;
     });
 }
@@ -194,8 +195,9 @@ exports.convertPriceUsdToEth = convertPriceUsdToEth;
 function convertPriceEthToUsd(priceInEth, timeStamp) {
     return __awaiter(this, void 0, void 0, function* () {
         const priceEthUsdAtTime = yield getPriceAtTime('ETH', 'USDT', timeStamp, 1);
-        const priceUsd = priceInEth * priceEthUsdAtTime;
-        return priceUsd;
+        const usdPerEth = 1 / priceEthUsdAtTime;
+        const priceEth = priceInEth * usdPerEth;
+        return priceEth;
     });
 }
 exports.convertPriceEthToUsd = convertPriceEthToUsd;
@@ -237,12 +239,13 @@ function getPriceAtTime(from, to, timestamp, chainId) {
         const pair = yield getPairFromSymbols(from, to, chainId);
         if (!pair)
             throw new Error(`No pair found from ${from} to ${to} and chainID ${chainId}`);
-        console.log(`pair : ${JSON.stringify(pair, null, 2)}`);
-        console.log(`pair.address ---> : ${pair.liquidityToken.address}`);
-        console.log(`timestamp ---> : ${timestamp}`);
-        console.log(`chainId ---> : ${chainId}`);
+        const quoteToken = pair.tokenAmounts[0].token.symbol === from ? 'from' : 'to';
+        ///console.log(`quoteToken ---> : ${quoteToken}`)
+        // console.log(`pair : ${JSON.stringify(pair, null, 2)}`)
+        // console.log(`pair.address ---> : ${pair.liquidityToken.address}`)
+        // console.log(`timestamp ---> : ${timestamp}`)
+        // console.log(`chainId ---> : ${chainId}`)
         const swap = yield theGraph_1.fetchSwapForPair(pair.liquidityToken.address.toLowerCase(), Math.round(timestamp), chainId);
-        console.log(`swap§ ---> : ${swap}`);
         const price = price_1.getPriceFromSwap(swap, to);
         // const action = getActionFromSwap(swap, to)
         // let action: string = ''
@@ -256,7 +259,7 @@ function getPriceAtTime(from, to, timestamp, chainId) {
         // } else {
         //   throw new Error('Should not happen')
         // }
-        return price;
+        return quoteToken === 'from' ? price : 1 / price;
     });
 }
 exports.getPriceAtTime = getPriceAtTime;

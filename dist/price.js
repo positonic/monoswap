@@ -7,7 +7,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * @returns
  */
 function getPriceFromSwap(swap, baseSymbol) {
-    console.log(`swap : ${JSON.stringify(swap, null, 2)}`);
     const baseToken = swap.pair.token0.symbol === baseSymbol ? 0 : 1;
     let price = 0;
     if (Number(swap.amount0In) > 0) {

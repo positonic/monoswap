@@ -32,7 +32,7 @@ function fetchSwapForPair(pairId, timestamp, chainId) {
       }
   }
   `;
-        console.log(`query ---> : ${query}`);
+        // console.log(`query ---> : ${query}`)
         let graphUrl = '';
         if (chainId === 1) {
             graphUrl = 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2';

@@ -1,6 +1,11 @@
 var assert = require('assert')
 import { getPriceFromSwap, getActionFromSwap } from './price'
-import { convertPriceUsdToEth, getPairFromAddresses } from './index'
+import {
+  convertPriceUsdToEth,
+  getPairFromAddresses,
+  convertPriceEthToUsd,
+  getPriceAtTime
+} from './index'
 
 const swap = {
   amount0In: '0.001443376148615378',
@@ -107,4 +112,44 @@ describe('Test something', function () {
     assert.equal(pair.tokenAmounts[0].currency.symbol, 'USDC')
     assert.equal(pair.tokenAmounts[1].currency.symbol, 'WETH')
   })
+})
+describe('Convert', function () {
+  it('convertPriceEthToUsd', async function () {
+    // const priceAtTime = await getPriceAtTime('HNY', 'ETH', 1616943939, 100)
+
+    // assert.equal(2.0791236591005577, priceAtTime)
+
+    // const priceHnyWxDai = await getPriceAtTime('HNY', 'WXDAI', 1616943939, 100)
+
+    // console.log(`priceHnyWxDai : ${JSON.stringify(priceHnyWxDai, null, 2)}`)
+    // assert.equal(priceHnyWxDai, 0.017085662902985275)
+
+    const priceAtTimeUni = await getPriceAtTime('UNI', 'ETH', 1615402064, 1)
+
+    console.log(`priceAtTimeUni : ${JSON.stringify(priceAtTimeUni, null, 2)}`)
+    assert.equal(priceAtTimeUni, 0.017085662902985275)
+
+    const priceAtTimePan = await getPriceAtTime('PAN', 'ETH', 1615402064, 1)
+
+    console.log(`priceAtTimePan : ${JSON.stringify(priceAtTimePan, null, 2)}`)
+    assert.equal(priceAtTimePan, 0.00004538174328413723)
+  })
+  // it('convertPriceEthToUsd', async function () {
+  //   const priceInUsd = await convertPriceEthToUsd(19880.80941858124, 1616606884)
+
+  //   console.log(
+  //     `convertPriceEthToUsd priceInUsd : ${JSON.stringify(priceInUsd, null, 2)}`
+  //   )
+
+  //   //assert.equal(priceInUsd, 111)
+  //   // const priceInUsd = await convertPriceEthToUsd(
+  //   //   0.017085662902985275,
+  //   //   1616943939
+  //   // )
+
+  //   // assert.equal(priceInUsd, 111)
+  //   // const priceInUsd = await convertPriceEthToUsd(1000, 1616943939)
+
+  //   // assert.equal(priceInUsd, 111)
+  // })
 })
