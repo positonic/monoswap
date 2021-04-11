@@ -1,5 +1,6 @@
 import * as UniSdk from '@uniswap/sdk'
 import * as HoneySdk from 'honeyswap-sdk'
+import * as PancakeSdk from '@pancakeswap-libs/sdk'
 
 interface token {
   chainId: number
@@ -40,6 +41,9 @@ export default class Sdk {
       this.sdk = UniSdk
     } else if (isXDai(chainId)) {
       this.sdk = HoneySdk
+    } else if (chainId === 56) {
+      console.log(`GOINFOR 56`)
+      this.sdk = PancakeSdk
     } else {
       throw new Error(`${chainId} is unsupported`)
     }
@@ -72,8 +76,8 @@ export default class Sdk {
     const route = new Route([pair], token)
     const price = route.midPrice.toSignificant(6)
 
-    console.log('JIS inv', route.midPrice.invert().toSignificant(6)) // 0.00496756
-    console.log('price', price) // 201.306
+    // console.log('JIS inv', route.midPrice.invert().toSignificant(6)) // 0.00496756
+    // console.log('price', price) // 201.306
 
     return Number(price)
   }

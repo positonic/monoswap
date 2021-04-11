@@ -8,13 +8,8 @@ import { getPriceFromSwap, getActionFromSwap } from './price'
 
 const INFURA_ID = config.get('ETHEREUM_NODE_ID')
 
-function getProvider (network) {
+export function getProvider (network) {
   if (network === 'xdaiChain') {
-    console.log(
-      `config.get('XDAI_NODE_HTTP_URL') ---> : ${config.get(
-        'XDAI_NODE_HTTP_URL'
-      )}`
-    )
     return new ethers.providers.JsonRpcProvider(
       config.get('XDAI_NODE_HTTP_URL').toString()
     )
@@ -22,13 +17,15 @@ function getProvider (network) {
   return new ethers.providers.InfuraProvider(network, INFURA_ID)
 }
 
-function getNetworkFromChainId (chainId) {
+export function getNetworkFromChainId (chainId: number) {
   if (chainId === 1) {
     return 'mainnet'
   } else if (chainId === 100) {
     return 'xdaiChain'
   } else if (chainId === 3) {
     return 'ropstem'
+  } else if (chainId === 56) {
+    return 'bsc'
   } else {
     throw new Error('Invalid chainId')
   }
@@ -173,10 +170,6 @@ export async function getPairFromSymbols (
 ) {
   const sdk = new Sdk(chainId)
 
-  if (isETHisETH(symbol, baseSymbol)) return getETHisETHPrice()
-  // if (isTestPrice(symbol, baseSymbol))
-  //   return getTestPrice(symbol, baseSymbol, chainId)
-
   const token = await sdk.getSwapToken(getTokenFromList(symbol, chainId))
 
   if (!token) throw Error(`Symbol ${symbol} not found in our token list`)
@@ -189,28 +182,82 @@ export async function getPairFromSymbols (
 
   if (token.address === baseToken.address) return 1
 
-  return await sdk.getPair(
-    token,
-    baseToken,
-    getProvider(getNetworkFromChainId(chainId)),
-    chainId
-  )
+  try {
+    const pair = await sdk.getPair(
+      token,
+      baseToken,
+      getProvider(getNetworkFromChainId(chainId)),
+      chainId
+    )
+    return pair
+  } catch (e) {
+    return null
+  }
 }
 
+export async function getTokenPriceFromSdk (pair, token, chainId: number) {
+  try {
+    const sdk = new Sdk(chainId)
+    return sdk.getPrice(pair, token, chainId)
+  } catch (error) {
+    console.error(error)
+    throw new Error(error)
+  }
+}
+
+export async function getTokenPriceFromEthPrice (
+  fromSymbol: string,
+  toSymbol: string,
+  chainId: number,
+  timestamp: number
+) {
+  const sdk = new Sdk(chainId)
+  let pair
+  const token = await sdk.getSwapToken(getTokenFromList(fromSymbol, chainId))
+  try {
+    pair = await getPairFromSymbols(fromSymbol, 'ETH', chainId)
+    const ethPerToken = await getTokenPriceFromSdk(pair, token, chainId)
+
+    if (toSymbol === 'USD' || toSymbol === 'USDT' || toSymbol === 'USDC') {
+      const usdPerToken = await convertPriceEthToUsd(ethPerToken, timestamp)
+
+      return usdPerToken
+    } else {
+      throw new Error(
+        `Can't convert symbol ${fromSymbol} to base symbol ${toSymbol}`
+      )
+    }
+  } catch (e) {
+    throw new Error(
+      ` getTokenPriceFromEthPrice can't convert symbol ${fromSymbol} to ${toSymbol} sdkPairs is ${pair}`
+    )
+  }
+}
 export async function getTokenPrice (
   symbol: string,
   baseSymbol: string,
   chainId: number
 ) {
   try {
+    if (isETHisETH(symbol, baseSymbol)) return getETHisETHPrice()
+
     const sdk = new Sdk(chainId)
 
-    const pair = getPairFromSymbols(symbol, baseSymbol, chainId)
+    const pair = await getPairFromSymbols(symbol, baseSymbol, chainId)
 
-    const token = await sdk.getSwapToken(getTokenFromList(symbol, chainId))
-
-    if (!token) throw Error(`Symbol ${symbol} not found in our token list`)
-    return sdk.getPrice(pair, token, chainId)
+    if (pair) {
+      const token = await sdk.getSwapToken(getTokenFromList(symbol, chainId))
+      return getTokenPriceFromSdk(pair, token, chainId)
+    } else {
+      const nowStamp = Date.now()
+      const price = getTokenPriceFromEthPrice(
+        symbol,
+        baseSymbol,
+        chainId,
+        nowStamp
+      )
+      return price
+    }
   } catch (error) {
     console.error(error)
     throw new Error(error)
@@ -349,4 +396,44 @@ async function getTokenFromAddress (address: string, chainId: number) {
   }
 
   return token
+}
+
+/**
+ *
+ * @param symbol 'MKR'
+ * @param baseSymbol 'USDT'
+ * @param chainId 1
+ * @returns
+ */
+export async function getTokenExecutionPrice (
+  symbol: string,
+  baseSymbol: string,
+  chainId: number,
+  amount: number
+) {
+  try {
+    const sdk = new Sdk(chainId)
+    const token = await sdk.getSwapToken(getTokenFromList(symbol, chainId))
+
+    if (!token) throw Error(`Symbol ${symbol} not found in our token list`)
+
+    const baseToken = await sdk.getSwapToken(
+      getTokenFromList(baseSymbol, chainId)
+    )
+    if (!baseToken)
+      throw Error(`BaseSymbol ${baseSymbol} not found in our token list`)
+
+    if (token.address === baseToken.address) return 1
+    const provider = getProvider(getNetworkFromChainId(chainId))
+    const pair = await sdk.getPair(token, baseToken, provider, chainId)
+    const price = sdk.getExecutionPrice(pair, baseToken, amount) // NO await?
+
+    //console.log(`xprice : ${JSON.stringify(price, null, 2)}`)
+
+    return price
+    // return sdk.getPrice(pair, token, chainId)
+  } catch (error) {
+    console.error(error)
+    throw new Error(error)
+  }
 }

@@ -18,6 +18,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const UniSdk = __importStar(require("@uniswap/sdk"));
 const HoneySdk = __importStar(require("honeyswap-sdk"));
+const PancakeSdk = __importStar(require("@pancakeswap-libs/sdk"));
 function isMainNet(chainId) {
     return chainId === 1;
 }
@@ -40,6 +41,10 @@ class Sdk {
         else if (isXDai(chainId)) {
             this.sdk = HoneySdk;
         }
+        else if (chainId === 56) {
+            console.log(`GOINFOR 56`);
+            this.sdk = PancakeSdk;
+        }
         else {
             throw new Error(`${chainId} is unsupported`);
         }
@@ -61,8 +66,8 @@ class Sdk {
         const { Route } = this.sdk;
         const route = new Route([pair], token);
         const price = route.midPrice.toSignificant(6);
-        console.log('JIS inv', route.midPrice.invert().toSignificant(6)); // 0.00496756
-        console.log('price', price); // 201.306
+        // console.log('JIS inv', route.midPrice.invert().toSignificant(6)) // 0.00496756
+        // console.log('price', price) // 201.306
         return Number(price);
     }
     getExecutionPrice(pair, token, amount) {
