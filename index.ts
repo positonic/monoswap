@@ -116,7 +116,11 @@ export async function getTokenPriceFromAddress (
  */
 export function getTokenFromList (symbol: string, chainId: number) {
   const inSymbol =
-    symbol.toUpperCase() === 'ETH' ? 'WETH' : symbol.toUpperCase()
+    symbol.toUpperCase() === 'ETH'
+      ? 'WETH'
+      : symbol.toUpperCase() === 'XDAI'
+      ? 'WXDAI'
+      : symbol.toUpperCase()
 
   const token = allTokens.find(
     o => o.symbol === inSymbol && o.chainId === chainId
