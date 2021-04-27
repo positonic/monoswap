@@ -61,6 +61,7 @@ exports.getOurTokenList = getOurTokenList;
 function getTokenPrices(symbol, baseSymbols, chainId) {
     return __awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve, reject) => {
+            console.log('getTokenPrices');
             const pricePromises = baseSymbols.map(base => getTokenPrice(symbol, base, chainId));
             Promise.all(pricePromises)
                 .then((prices) => {
@@ -120,7 +121,11 @@ exports.getTokenPriceFromAddress = getTokenPriceFromAddress;
  * Get Token details
  */
 function getTokenFromList(symbol, chainId) {
-    const inSymbol = symbol.toUpperCase() === 'ETH' ? 'WETH' : symbol.toUpperCase();
+    const inSymbol = symbol.toUpperCase() === 'ETH'
+        ? 'WETH'
+        : symbol.toUpperCase() === 'XDAI'
+            ? 'WXDAI'
+            : symbol.toUpperCase();
     const token = tokenLists_1.allTokens.find(o => o.symbol === inSymbol && o.chainId === chainId);
     if (!token)
         throw new Error(`Token ${inSymbol} not found for chainId ${chainId}`);
@@ -133,6 +138,10 @@ function isTestPrice(symbol, baseSymbol) {
 }
 function isETHisETH(symbol, baseSymbol) {
     return symbol === 'ETH' && baseSymbol === 'ETH';
+}
+function isXDAIisXDAI(symbol, baseSymbol) {
+    return ((symbol === 'XDAI' || symbol === 'WXDAI') &&
+        (baseSymbol === 'XDAI' || baseSymbol === 'WXDAI'));
 }
 function getTestPrice(symbol, baseSymbol, chainId) {
     if (symbol === 'ETH' && baseSymbol === 'USDT')
@@ -215,6 +224,8 @@ function getTokenPrice(symbol, baseSymbol, chainId) {
         try {
             if (isETHisETH(symbol, baseSymbol))
                 return getETHisETHPrice();
+            if (isXDAIisXDAI(symbol, baseSymbol))
+                return 1;
             const sdk = new sdk_1.default(chainId);
             const pair = yield getPairFromSymbols(symbol, baseSymbol, chainId);
             if (pair) {

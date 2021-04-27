@@ -140,6 +140,12 @@ function isTestPrice (symbol, baseSymbol) {
 function isETHisETH (symbol, baseSymbol) {
   return symbol === 'ETH' && baseSymbol === 'ETH'
 }
+function isXDAIisXDAI (symbol, baseSymbol) {
+  return (
+    (symbol === 'XDAI' || symbol === 'WXDAI') &&
+    (baseSymbol === 'XDAI' || baseSymbol === 'WXDAI')
+  )
+}
 function getTestPrice (symbol, baseSymbol, chainId) {
   if (symbol === 'ETH' && baseSymbol === 'USDT') return 2000
   if (symbol === 'ETH' && baseSymbol === 'ETH') return 1
@@ -247,6 +253,7 @@ export async function getTokenPrice (
 ) {
   try {
     if (isETHisETH(symbol, baseSymbol)) return getETHisETHPrice()
+    if (isXDAIisXDAI(symbol, baseSymbol)) return 1
 
     const sdk = new Sdk(chainId)
 
