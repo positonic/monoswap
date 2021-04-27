@@ -570,6 +570,13 @@ exports.ropstenTokenList = [
         symbol: 'DAI',
         name: 'DAI Ropsten',
         decimals: 18
+    },
+    {
+        chainId: 3,
+        address: '0x067eA48882E6D728A37acfd1535ec03f8E33794a',
+        symbol: 'WETH',
+        name: 'YAY WETH',
+        decimals: 18
     }
 ];
 exports.xDaiTokenList = [

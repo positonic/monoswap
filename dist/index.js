@@ -23,9 +23,12 @@ const sdk_1 = __importDefault(require("./sdk"));
 const ethers = __importStar(require("ethers"));
 const config_1 = __importDefault(require("./config"));
 const tokenLists_1 = require("./tokenLists");
+//import { pairs } from './pairLists'
 const theGraph_1 = require("./theGraph");
 const price_1 = require("./price");
+const monoswapPairs_1 = require("./monoswapPairs");
 const INFURA_ID = config_1.default.get('ETHEREUM_NODE_ID');
+exports.pairs = monoswapPairs_1.pairs;
 function getProvider(network) {
     if (network === 'xdaiChain') {
         return new ethers.providers.JsonRpcProvider(config_1.default.get('XDAI_NODE_HTTP_URL').toString());

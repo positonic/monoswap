@@ -38,6 +38,9 @@ class Sdk {
         if (isMainNet(chainId)) {
             this.sdk = UniSdk;
         }
+        else if (chainId === 3) {
+            this.sdk = UniSdk;
+        }
         else if (isXDai(chainId)) {
             this.sdk = HoneySdk;
         }

@@ -22,7 +22,7 @@ async function fetchSwapForPair(pairId, timestamp, chainId) {
       }
   }
   `
-  // console.log(`query ---> : ${query}`)
+  console.log(`query ---> : ${query}`)
   let graphUrl = ''
   if(chainId === 1) {
     graphUrl = 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2'
@@ -31,18 +31,24 @@ async function fetchSwapForPair(pairId, timestamp, chainId) {
   } else {
     throw new Error("unsupported chainId")
   }
-  const response = await axios({
-    url: graphUrl,
-    method: 'post',
-    data: {
-      query
-    }
-  })
-
-  //console.log(`response : ${JSON.stringify(response, null, 2)}`)
+  try {
+    const response = await axios({
+      url: graphUrl,
+      method: 'post',
+      data: {
+        query
+      }
+    })
   
-
-  return response.data.data.swaps[0]
+    //console.log(`response : ${JSON.stringify(response, null, 2)}`)
+    
+  
+    return response.data.data.swaps[0]
+  } catch (error) {
+    console.error(error)
+    throw new Error(`Error for pairId: ${pairId}, timestamp: ${timestamp}, chainId: ${chainId}`)
+  }
+  
   
 }
 

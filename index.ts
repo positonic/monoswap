@@ -2,11 +2,14 @@ import Sdk from './sdk'
 import * as ethers from 'ethers'
 import config from './config'
 import { allTokens } from './tokenLists'
-import { pairs } from './pairLists'
+//import { pairs } from './pairLists'
 import { fetchSwapForPair } from './theGraph'
 import { getPriceFromSwap, getActionFromSwap } from './price'
+import { pairs as monoswapPairs } from './monoswapPairs'
 
 const INFURA_ID = config.get('ETHEREUM_NODE_ID')
+
+export const pairs = monoswapPairs
 
 export function getProvider (network) {
   if (network === 'xdaiChain') {

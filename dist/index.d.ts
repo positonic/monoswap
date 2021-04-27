@@ -1,4 +1,31 @@
 import * as ethers from 'ethers';
+export declare const pairs: {
+    label: string;
+    exchange: string;
+    marketLabel: string;
+    id: string;
+    liquidityProviderCount: string;
+    reserve0: string;
+    reserve1: string;
+    reserveUSD: string;
+    token0: {
+        derivedETH: string;
+        id: string;
+        name: string;
+        symbol: string;
+    };
+    token0Price: string;
+    token1: {
+        derivedETH: string;
+        id: string;
+        name: string;
+        symbol: string;
+    };
+    token1Price: string;
+    trackedReserveETH: string;
+    txCount: string;
+    volumeUSD: string;
+}[];
 export declare function getProvider(network: any): ethers.ethers.providers.JsonRpcProvider;
 export declare function getNetworkFromChainId(chainId: number): "xdaiChain" | "mainnet" | "ropstem" | "bsc";
 export declare function getOurTokenList(): {
