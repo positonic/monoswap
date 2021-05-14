@@ -26517,6 +26517,42 @@ const honeyswapPairs = {
         ]
     }
 };
+//All seem to pass through a central router WAult contract - 0xd48745e39bbed146eec15b79cbf964884f9877c2
+//For example: https://bscscan.com/tx/0x1b2dd56bd3badea827debe134380491a8b9e4026eff4e4af2abcf727913fb800
+//For now will run with that address and the pair appended 
+const waultSwapPairs = {
+    data: {
+        pairs: [
+            {
+                id: '0xd48745e39bbed146eec15b79cbf964884f9877c2 wex-busd',
+                token0: {
+                    id: '0xa9c41a46a6b3531d28d5c32f6633dd2ff05dfb90',
+                    name: 'WEX',
+                    symbol: 'WEX',
+                    derivedETH: '0',
+                },
+                token1: {
+                    id: '0xe9e7cea3dedca5984780bafc599bd69add087d56',
+                    name: 'Binance USD',
+                    symbol: 'BUSD',
+                    derivedETH: '0',
+                },
+                liquidityProviderCount: '0',
+                reserve0: '0',
+                reserve1: '0',
+                reserveUSD: '0',
+                token0Price: '0',
+                token1Price: '0',
+                trackedReserveETH: '0',
+                txCount: '0',
+                volumeUSD: '0'
+            }
+        ]
+    }
+};
+let waultPairs = waultSwapPairs.data.pairs.map(pair => {
+    return Object.assign(Object.assign({}, pair), { label: pair.token0.symbol + '-' + pair.token1.symbol, exchange: 'wault', marketLabel: `wault:${pair.token0.symbol + '-' + pair.token1.symbol}` });
+});
 let honeyPairs = honeyswapPairs.data.pairs.map(pair => {
     return Object.assign(Object.assign({}, pair), { label: pair.token0.symbol + '-' + pair.token1.symbol, exchange: 'uniswap', marketLabel: `uniswap:${pair.token0.symbol + '-' + pair.token1.symbol}` });
 });
@@ -26524,5 +26560,5 @@ const uniPairs = topUniswapPairs.data.pairs.map(pair => {
     return Object.assign(Object.assign({}, pair), { label: pair.token0.symbol + '-' + pair.token1.symbol, exchange: 'uniswap', marketLabel: `uniswap:${pair.token0.symbol + '-' + pair.token1.symbol}` });
 });
 const allPairs = honeyPairs.concat(uniPairs);
-exports.pairs = allPairs;
+exports.pairs = allPairs.concat(waultPairs);
 //# sourceMappingURL=monoswapPairs.js.map
