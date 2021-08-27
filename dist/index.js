@@ -1,4 +1,23 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -11,14 +30,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getTokenExecutionPrice = exports.getPriceAtTime = exports.getTokenExecutionPriceFromAddress = exports.convertPriceEthToUsd = exports.convertPriceUsdToEth = exports.getTokenPrice = exports.getTokenPriceFromEthPrice = exports.getTokenPriceFromSdk = exports.getPairFromSymbols = exports.getPairFromAddresses = exports.getTokenFromList = exports.getTokenPriceFromAddress = exports.getTokenPricesFromAddress = exports.getTokenPrices = exports.getOurTokenList = exports.getNetworkFromChainId = exports.getProvider = exports.pairs = void 0;
 const sdk_1 = __importDefault(require("./sdk"));
 const ethers = __importStar(require("ethers"));
 const config_1 = __importDefault(require("./config"));
@@ -61,7 +74,6 @@ exports.getOurTokenList = getOurTokenList;
 function getTokenPrices(symbol, baseSymbols, chainId) {
     return __awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve, reject) => {
-            console.log('getTokenPrices');
             const pricePromises = baseSymbols.map(base => getTokenPrice(symbol, base, chainId));
             Promise.all(pricePromises)
                 .then((prices) => {
@@ -307,8 +319,8 @@ function getPriceAtTime(from, to, timestamp, chainId) {
         // console.log(`pair.address ---> : ${pair.liquidityToken.address}`)
         // console.log(`timestamp ---> : ${timestamp}`)
         // console.log(`chainId ---> : ${chainId}`)
-        const swap = yield theGraph_1.fetchSwapForPair(pair.liquidityToken.address.toLowerCase(), Math.round(timestamp), chainId);
-        const price = price_1.getPriceFromSwap(swap, to);
+        const swap = yield (0, theGraph_1.fetchSwapForPair)(pair.liquidityToken.address.toLowerCase(), Math.round(timestamp), chainId);
+        const price = (0, price_1.getPriceFromSwap)(swap, to);
         // const action = getActionFromSwap(swap, to)
         // let action: string = ''
         // let price: number = 0
