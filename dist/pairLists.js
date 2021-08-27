@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.pairs = void 0;
 const mainnet = [
     {
         chainId: 1,

@@ -224,6 +224,13 @@ const cmc200 = {
     },
     {
       chainId: 1,
+      address: '0x03ab458634910aad20ef5f1c8ee96f1d6ac54919',
+      symbol: 'RAI',
+      name: 'Rai Reflex Index',
+      decimals: 18
+    },
+    {
+      chainId: 1,
       address: '0x408e41876cccdc0f92210600ef50372656052a38',
       symbol: 'REN',
       name: 'Ren',

@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.pairs = exports.fetchPairData = void 0;
 const axios = require('axios');
 //only returns 100 or 1000:
 const allPairsQuery = `{

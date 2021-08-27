@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.allTokens = exports.xDaiTokenList = exports.ropstenTokenList = void 0;
 /**
  * Source:
    const coinListUrl = 'https://wispy-bird-88a7.uniswap.workers.dev/?url=http://erc20.cmc.eth.link'
@@ -222,6 +223,13 @@ const cmc200 = {
             address: '0x6b175474e89094c44da98b954eedeac495271d0f',
             symbol: 'DAI',
             name: 'Dai',
+            decimals: 18
+        },
+        {
+            chainId: 1,
+            address: '0x03ab458634910aad20ef5f1c8ee96f1d6ac54919',
+            symbol: 'RAI',
+            name: 'Rai Reflex Index',
             decimals: 18
         },
         {
